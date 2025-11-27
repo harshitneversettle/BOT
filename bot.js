@@ -5,7 +5,8 @@ require('dotenv').config();
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true });
+const bot = new TelegramBot(process.env.TELEGRAM_TOKEN);
+
 const app = express();
 
 app.use(express.json());
