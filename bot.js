@@ -144,7 +144,7 @@ bot.on('message', async (msg) => {
 
 // Start Express server
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(` running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
 });
 
