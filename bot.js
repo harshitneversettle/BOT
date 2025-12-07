@@ -1,7 +1,7 @@
-const TelegramBot = require('node-telegram-bot-api');
-const express = require('express');
-const fs = require('fs');
-require('dotenv').config();
+const TelegramBot = require("node-telegram-bot-api");
+const express = require("express");
+const fs = require("fs");
+require("dotenv").config();
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -12,19 +12,19 @@ const app = express();
 app.use(express.json());
 
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
   next();
 });
 
-const brain = fs.readFileSync('brain.txt', 'utf8');
+const brain = fs.readFileSync("brain.txt", "utf8");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 async function getAIResponse(userMessage) {
   try {
@@ -105,46 +105,49 @@ Always prioritize clarity and readability over length.
   }
 }
 
-app.post('/api/chat', async (req, res) => {
+app.post("/api/chat", async (req, res) => {
   try {
-    console.log('Received request:', req.body);
-    
+    console.log("Received request:", req.body);
+
     const { message } = req.body;
-    
+
     if (!message) {
-      return res.status(400).json({ success: false, error: 'Message is required' });
+      return res
+        .status(400)
+        .json({ success: false, error: "Message is required" });
     }
 
     const reply = await getAIResponse(message);
-    console.log('Sending reply:', reply);
-    
+    console.log("Sending reply:", reply);
+
     res.json({ success: true, response: reply });
   } catch (error) {
-    console.error('API Error:', error);
-    res.status(500).json({ success: false, error: 'Failed to process message' });
+    console.error("API Error:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to process message" });
   }
 });
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Bot is running' });
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", message: "Bot is running" });
 });
 
 // Telegram bot handler
-bot.on('message', async (msg) => {
+bot.on("message", async (msg) => {
   const chatId = msg.chat.id;
   const userText = msg.text;
 
   if (!userText) return;
 
-  bot.sendChatAction(chatId, 'typing');
+  bot.sendChatAction(chatId, "typing");
   const reply = await getAIResponse(userText);
   bot.sendMessage(chatId, reply);
 });
 
 // Start Express server
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
-
